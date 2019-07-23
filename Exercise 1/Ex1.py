@@ -24,8 +24,6 @@ def imReadAndConvert(filename, representation):
         img2 = cv2.merge([r,g,b])
         return img2
     
-    #print(img)
-    #print(type(img))
     return img
 
 # Calculate the grayscale values so as to have the same luminance as the original color image
@@ -45,67 +43,70 @@ def RGBtoGray(img):
     
     return img
 
-# Displaying the image, depends on representation paramter if to change it to grayscale or not
+# Displaying the image, depending on representation paramter if to change it to grayscale or not
 def imDisplay(filename, representation):
     #img = imReadAndConvert(filename, representation)
-    
     
     img2 = cv2.imread(filename)
     #imgYIQ = transformRGB2YIQ(img2)
     
     imgRGB = transformYIQ2RGB(img2)
     #cv2.imwrite('222.jpg',imgRGB) # saving image
-    plt.imshow(imgRGB)
-    #plt.imshow(imgYIQ)
-    plt.show()
-    #imgYIQ = imgYIQ*255
+    #plt.imshow(imgRGB)
     
+    plt.imshow(imgRGB)
+    plt.show()
+    
+# transforming a RGB values to YIQ values    
 def transformRGB2YIQ(img):
-
+    
+    # taking sizes of input to make a new image
     height = img.shape[0]
     width = img.shape[1]
     
+    # creating a new matrix, same size as input with 3 dimension
     YIQ = np.zeros((height,width,3))
+    # splitting each dimension to a matrix, it is BGR in opencv functions
     b,g,r = cv2.split(img)
-    #img2 = cv2.merge([r,g,b])
+    
     imgY = 0.299 * r + 0.587 * g + 0.114 * b
     imgI = 0.596 * r - 0.275 * g - 0.321 * b
     imgQ = 0.212 * r - 0.523 * g + 0.311 * b
     
     YIQ = cv2.merge([imgY,imgI,imgQ])
-    #cv2.imwrite("onePic123.jpg", YIQ)
+    #saving an image as YIQ
+    cv2.imwrite('yiq_photo.jpg',cv2.merge([imgQ,imgI,imgY]))
     YIQ = YIQ*(1./255)
     print(YIQ)
     return(YIQ)
 
+# transforming a YIQ values to RGB values
 def transformYIQ2RGB(img):
-    
+
+    # taking sizes of input to make a new image
     height = img.shape[0]
     width = img.shape[1]
     
+    # creating a new matrix, same size as input with 3 dimension
     RGB = np.zeros((height,width,3))
-    y,i,q = cv2.split(img)
-    img2 = cv2.merge([y,i,q])
+    q,i,y = cv2.split(img)
+    
     imgR = 1 * y + 0.956 * i + 0.619 * q
     imgG = 1 * y - 0.272 * i - 0.647 * q
     imgB = 1 * y - 1.106 * i + 1.703 * q
     
     RGB = cv2.merge([imgR,imgG,imgB])
+    
     RGB = RGB*(1./255)
-    #RGB[:,:,1] = RGB[:,:,1] * (-1)
-    #RGB[:,:,2] = RGB[:,:,2] / 2.
-    print(RGB)
+    # saving an image as RGB
+    cv2.imwrite('rgb_photo.jpg',cv2.merge([imgB,imgG,imgR]))
     return(RGB)
 
 
 
 
 
-im = imDisplay(filename = 'onePic2.jpg', representation = 2)
+im = imDisplay(filename = 'yiq_photo.jpg', representation = 2)
 
-# 3->2 
-# hist = np.histogram(image.flatten(),256,[0,256])[0]
-
-#cv2.destroyAllWindows() # closing all images
 
 
