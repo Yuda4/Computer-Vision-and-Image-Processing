@@ -44,15 +44,15 @@ def imDisplay(filename, representation):
     #img = imReadAndConvert(filename, representation)
     
     img2 = cv2.imread(filename)
-    #img2 = histogramEqualize(img2)
+    img2 = histogramEqualize(img2)
     #imgYIQ = transformRGB2YIQ(img2)
     
-    imgRGB = transformYIQ2RGB(img2)
+    #imgRGB = transformYIQ2RGB(img2)
     #cv2.imwrite('222.jpg',imgRGB) # saving image
-    plt.imshow(imgRGB)
+    #plt.imshow(imgRGB)
     
     #plt.imshow(imgYIQ)
-    #plt.imshow(img2)
+    plt.imshow(img2)
     plt.show()
     
 # transforming a RGB values to YIQ values    
@@ -79,7 +79,7 @@ def transformRGB2YIQ(img):
 
 # transforming a YIQ values to RGB values
 def transformYIQ2RGB(img):
-
+    print(img.shape)
     # taking sizes of input to make a new image
     height = img.shape[0]
     width = img.shape[1]
@@ -87,8 +87,7 @@ def transformYIQ2RGB(img):
     # creating a new matrix, same size as input with 3 dimension
     RGB = np.zeros((height,width,3))
     q,i,y = cv2.split(img)
-    # convert to 3*M*N
-    img.reshape((3,height*width))
+    img = cv2.merge([y,i,q])
 
     imgR = 1 * y + 0.956 * i + 0.619 * q
     imgG = 1 * y - 0.272 * i - 0.647 * q
@@ -97,13 +96,15 @@ def transformYIQ2RGB(img):
     RGB = cv2.merge([imgR,imgG,imgB])
     
     RGB = RGB*(1./255)
+    print(RGB)
     # saving an image as RGB
     #cv2.imwrite('rgb_photo.jpg',cv2.merge([imgB,imgG,imgR]))
+    #print(RGB)
     return(RGB)
 
 #
 def histogramEqualize(imOrig):
-    #imOrig = imOrig * (1./255)
+    
     
     B,G,R = cv2.split(imOrig)
 
@@ -111,6 +112,7 @@ def histogramEqualize(imOrig):
 
         print("Grayscale image")
     else:
+        
         imOrig = cv2.merge([R,G,B])
         imOrig = RGBtoGray(imOrig)
         
@@ -135,19 +137,38 @@ def histogramEqualize(imOrig):
         plt.xlim([0,256])
         plt.legend(('cdf','histogram'), loc = 'upper left')
         plt.show()
+        
+        cv2.waitKey(0)
 
 
-        res = np.hstack((original, equalize)) #stacking images side-by-side
-        cv2.imwrite('equ.jpg',res)
+        res = np.hstack((imOrig[:,:,1], equ)) #stacking images side-by-side
+        cv2.imwrite('equ2.jpg',res)
 
         #plt.hist(imOrig.ravel(),256,[0,256]) 
         #plt.show()
-        
-    
     return imOrig
 
+def hisAlgo():
 
-im = imDisplay(filename = 'yiq_photo.jpg', representation = 2)
+    img = cv2.imread('grayphoto.jpg')
+    
+    cv2.imshow('gray',img)
+    # calcHist(choosen img,grayscale chanle,mask image, # of bin, ranges)
+    hist = cv2.calcHist([img],[0],None,[256],[0,256])
+    cdf = hist.cumsum()
+    cdf_normalized = cdf * hist.max()/ cdf.max()
 
+    plt.plot(cdf_normalized, color = 'r')
+    plt.hist(img.ravel(),256,[0,256])
+    plt.title('Histogram for gray scale picture')
+    
+    plt.show()
+    cv2.waitKey(0)
+
+
+    
+
+im = imDisplay(filename = 'apple.jpg', representation = 2)
+#hisAlgo()
 
 
