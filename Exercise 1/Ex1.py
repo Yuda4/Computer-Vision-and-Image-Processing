@@ -103,7 +103,8 @@ def transformYIQ2RGB(img):
     #print(RGB)
     return(RGB)
 
-
+# Equalize an input image, if input is an RGB image it equalize it with Y channle of YIQ values, 
+#                             otherwise input image is grayscale and do it on gray values
 def histogramEqualize(imOrig):
     
     B,G,R = cv2.split(imOrig)
@@ -155,6 +156,7 @@ def showOutput(imOrig, imEq, histOrig, histEq):
     fig.set_figheight(5)
     fig.set_figwidth(10)
 
+    # display the original image
     fig.add_subplot(1,2,1)
     plt.imshow(imOrig)
 
@@ -164,16 +166,16 @@ def showOutput(imOrig, imEq, histOrig, histEq):
     fig.suptitle('Left is original photo, Right is equalized photo', fontsize=16)
     plt.show(block=True)
 
-
     # set up side-by-side image display
     fig = plt.figure()
     fig.set_figheight(5)
     fig.set_figwidth(10)
 
+    # display the original histogram image
     fig.add_subplot(1,2,1)
     plt.plot(histOrig)
 
-    # display the equalized image
+    # display the equalized histogram image
     fig.add_subplot(1,2,2)
     plt.plot(histEq)
     fig.suptitle('Left is histogram of original photo, Right is histogram of equalized photo', fontsize=12)
