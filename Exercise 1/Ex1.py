@@ -75,11 +75,12 @@ def transformRGB2YIQ(img):
     #saving an image as YIQ
     #cv2.imwrite('yiq_photo.jpg',cv2.merge([imgQ,imgI,imgY]))
     YIQ = YIQ*(1./255)
+    
     return(YIQ)
 
 # transforming a YIQ values to RGB values
 def transformYIQ2RGB(img):
-    print(img.shape)
+    
     # taking sizes of input to make a new image
     height = img.shape[0]
     width = img.shape[1]
@@ -102,73 +103,81 @@ def transformYIQ2RGB(img):
     #print(RGB)
     return(RGB)
 
-#
+
 def histogramEqualize(imOrig):
-    
     
     B,G,R = cv2.split(imOrig)
 
-    if(np.array_equal(R, G) and np.array_equal(G, B)):
+    # Grayscale image
+    if(np.array_equal(R, G) and np.array_equal(G, B)):      
+        imEq,histOrig,histEq = histogram(imOrig)
 
-        print("Grayscale image")
     else:
-        
-        imOrig = cv2.merge([R,G,B])
-        imOrig = RGBtoGray(imOrig)
-        
-        hist = cv2.calcHist([imOrig],[0],None,[256],[0,256])
-        cdf = hist.cumsum()
-        cdf_normalized = cdf * hist.max()/ cdf.max()
+        imOrig = cv2.merge([B,G,R])
+        YIQimage = transformRGB2YIQ(imOrig)
 
-        plt.plot(cdf_normalized, color = 'r')
-        original = plt.hist(imOrig.flatten(),256,[0,256], color = 'b')
-        plt.xlim([0,256])
-        plt.legend(('cdf','histogram'), loc = 'upper left')
-        plt.show()
+        YIQimage = YIQimage.astype(np.float32)
 
-        equ = cv2.equalizeHist(imOrig[:,:,0])
+        Q,I,Y = cv2.split(YIQimage)
+        YIQimage = cv2.merge([Q,I,Y])
+        Y = Y*255
+        imEq,histOrig,histEq = histogram(Y)
 
-        hist2 = cv2.calcHist([equ],[0],None,[256],[0,256])
-        cdf2 = hist.cumsum()
-        cdf2_normalized = cdf2 * hist2.max()/ cdf2.max()
+    imOrig = cv2.merge([R,G,B])
+    showOutput(imOrig, imEq, histOrig, histEq)
 
-        plt.plot(cdf2_normalized, color = 'r')
-        equalize = plt.hist(equ.flatten(),256,[0,256], color = 'b')
-        plt.xlim([0,256])
-        plt.legend(('cdf','histogram'), loc = 'upper left')
-        plt.show()
-        
-        cv2.waitKey(0)
+    return imEq, histOrig, histEq
 
+def histogram(img):
 
-        res = np.hstack((imOrig[:,:,1], equ)) #stacking images side-by-side
-        cv2.imwrite('equ2.jpg',res)
-
-        #plt.hist(imOrig.ravel(),256,[0,256]) 
-        #plt.show()
-    return imOrig
-
-def hisAlgo():
-
-    img = cv2.imread('grayphoto.jpg')
+    flat = img.flatten()
+    flat = flat.astype(int)
     
-    cv2.imshow('gray',img)
-    # calcHist(choosen img,grayscale chanle,mask image, # of bin, ranges)
-    hist = cv2.calcHist([img],[0],None,[256],[0,256])
-    cdf = hist.cumsum()
-    cdf_normalized = cdf * hist.max()/ cdf.max()
+    histOrig = cv2.calcHist([img],[0],None,[256],[0,256])
+    cdf = histOrig.cumsum()
 
-    plt.plot(cdf_normalized, color = 'r')
-    plt.hist(img.ravel(),256,[0,256])
-    plt.title('Histogram for gray scale picture')
+    nj = (cdf - cdf.min()) * 255
+    N = cdf.max() - cdf.min()
+    cdf = nj / N
+    cdf = cdf.astype('uint8')
     
-    plt.show()
-    cv2.waitKey(0)
+    # get the value from cumulative sum for every index in flat, and set that as newImage
+    imEq = cdf[flat]
+
+    histEq = cv2.calcHist([imEq],[0],None,[256],[0,256])
+    imEq = np.reshape(imEq, img.shape)
+
+    return imEq, histOrig, histEq
+
+def showOutput(imOrig, imEq, histOrig, histEq):
+    # set up side-by-side image display
+    fig = plt.figure()
+    fig.set_figheight(5)
+    fig.set_figwidth(10)
+
+    fig.add_subplot(1,2,1)
+    plt.imshow(imOrig)
+
+    # display the equalized image
+    fig.add_subplot(1,2,2)
+    plt.imshow(imEq)
+    fig.suptitle('Left is original photo, Right is equalized photo', fontsize=16)
+    plt.show(block=True)
 
 
-    
+    # set up side-by-side image display
+    fig = plt.figure()
+    fig.set_figheight(5)
+    fig.set_figwidth(10)
 
-im = imDisplay(filename = 'apple.jpg', representation = 2)
-#hisAlgo()
+    fig.add_subplot(1,2,1)
+    plt.plot(histOrig)
+
+    # display the equalized image
+    fig.add_subplot(1,2,2)
+    plt.plot(histEq)
+    fig.suptitle('Left is histogram of original photo, Right is histogram of equalized photo', fontsize=12)
+    plt.show(block=True)
 
 
+im = imDisplay(filename = 'apple.jpg', representation = 1)
