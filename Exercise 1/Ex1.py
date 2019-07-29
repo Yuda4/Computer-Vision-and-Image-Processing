@@ -10,15 +10,18 @@ import cv2
 def imReadAndConvert(filename, representation):
     # Loading an image
     img = cv2.imread(filename)
-    # normolaize pixels
-    img = img*(1./255)
-    if representation == 1:
-        # representation = 1 means grayscale image
-        img = RGBtoGray(img)
+    if img is not None:
+        # normolaize pixels
+        img = img*(1./255)
+        if representation == 1:
+            # representation = 1 means grayscale image
+            img = RGBtoGray(img)
+        else:
+            # representation = 2 means RGB image
+            b,g,r = cv2.split(img)
+            img = cv2.merge([r,g,b])
     else:
-        # representation = 2 means RGB image
-        b,g,r = cv2.split(img)
-        img = cv2.merge([r,g,b])
+        print("Invalid path for image")
         
     return img
 
@@ -43,18 +46,25 @@ def RGBtoGray(img):
 def imDisplay(filename, representation):
     #img = imReadAndConvert(filename, representation)
     
-    img2 = cv2.imread(filename)
-    img2 = histogramEqualize(img2)
-    #imgYIQ = transformRGB2YIQ(img2)
+    img = cv2.imread(filename)
+
+    y, z = quantizeImage(img,16,20)
     
-    #imgRGB = transformYIQ2RGB(img2)
-    #cv2.imwrite('222.jpg',imgRGB) # saving image
-    #plt.imshow(imgRGB)
-    
-    #plt.imshow(imgYIQ)
-    plt.imshow(img2)
-    plt.show()
-    
+
+    if img is not None:
+        #o, t, th = histogramEqualize(img)
+        #imgYIQ = transformRGB2YIQ(img)
+        
+        #imgRGB = transformYIQ2RGB(img)
+        #cv2.imwrite('222.jpg',imgRGB) # saving image
+        #plt.imshow(imgRGB)
+        
+        #plt.imshow(imgYIQ)
+        #plt.imshow(o)
+        plt.show()
+    else:
+        print("invalid path")
+        
 # transforming a RGB values to YIQ values    
 def transformRGB2YIQ(img):
     
@@ -97,10 +107,9 @@ def transformYIQ2RGB(img):
     RGB = cv2.merge([imgR,imgG,imgB])
     
     RGB = RGB*(1./255)
-    print(RGB)
+    
     # saving an image as RGB
     #cv2.imwrite('rgb_photo.jpg',cv2.merge([imgB,imgG,imgR]))
-    #print(RGB)
     return(RGB)
 
 # Equalize an input image, if input is an RGB image it equalize it with Y channle of YIQ values, 
@@ -134,6 +143,7 @@ def histogram(img):
     flat = img.flatten()
     flat = flat.astype(int)
     
+    # histogram of original image
     histOrig = cv2.calcHist([img],[0],None,[256],[0,256])
     cdf = histOrig.cumsum()
 
@@ -142,9 +152,11 @@ def histogram(img):
     cdf = nj / N
     cdf = cdf.astype('uint8')
     
-    # get the value from cumulative sum for every index in flat, and set that as newImage
+    # get the value from cumulative sum for every index in flat, 
+    # the results will set as the new image
     imEq = cdf[flat]
 
+    # histogram of equalized image
     histEq = cv2.calcHist([imEq],[0],None,[256],[0,256])
     imEq = np.reshape(imEq, img.shape)
 
@@ -166,7 +178,6 @@ def showOutput(imOrig, imEq, histOrig, histEq):
     fig.suptitle('Left is original photo, Right is equalized photo', fontsize=16)
     plt.show(block=True)
 
-    # set up side-by-side image display
     fig = plt.figure()
     fig.set_figheight(5)
     fig.set_figwidth(10)
@@ -181,5 +192,41 @@ def showOutput(imOrig, imEq, histOrig, histEq):
     fig.suptitle('Left is histogram of original photo, Right is histogram of equalized photo', fontsize=12)
     plt.show(block=True)
 
+def quantizeImage(imOrig, nQuant, nIter):
+    img = cv2.imread('apple.jpg')
+    Z = img.reshape((-1,3))
+    # convert to np.float32
+    Z = np.float32(Z)
+    # define criteria, number of clusters(K) and apply kmeans()
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+    
+    ret,label,center=cv2.kmeans(Z,nQuant,None,criteria,nIter,cv2.KMEANS_RANDOM_CENTERS)
 
-im = imDisplay(filename = 'apple.jpg', representation = 1)
+
+    print(label[500])
+    print(center[1])
+    # Now convert back into uint8, and make original image
+    center = np.uint8(center)
+    res = center[label.flatten()]
+    res2 = res.reshape((img.shape))
+    cv2.imshow('res2',res2)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    sse = []
+    list_k = list(range(1, 10))
+
+    for k in list_k:
+        km = KMeans(n_clusters=k)
+        km.fit(X_std)
+        sse.append(km.inertia_)
+
+    # Plot sse against k
+    plt.figure(figsize=(6, 6))
+    plt.plot(list_k, sse, '-o')
+    plt.xlabel(r'Number of clusters *k*')
+    plt.ylabel('Sum of squared distance')
+
+    
+    
+im = imDisplay(filename = 'grayphoto.jpg', representation = 2)
