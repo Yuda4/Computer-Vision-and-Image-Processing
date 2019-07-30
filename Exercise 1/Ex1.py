@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.matlib
 import matplotlib.pyplot as plt
 import cv2
 
@@ -44,27 +45,10 @@ def RGBtoGray(img):
 
 # Displaying the image, depending on representation paramter if to change it to grayscale or not
 def imDisplay(filename, representation):
-    #img = imReadAndConvert(filename, representation)
-    
-    img = cv2.imread(filename)
+    img = imReadAndConvert(filename, representation)
+    plt.imshow(img)
+    plt.show()
 
-    y, z = quantizeImage(img,16,20)
-    
-
-    if img is not None:
-        #o, t, th = histogramEqualize(img)
-        #imgYIQ = transformRGB2YIQ(img)
-        
-        #imgRGB = transformYIQ2RGB(img)
-        #cv2.imwrite('222.jpg',imgRGB) # saving image
-        #plt.imshow(imgRGB)
-        
-        #plt.imshow(imgYIQ)
-        #plt.imshow(o)
-        plt.show()
-    else:
-        print("invalid path")
-        
 # transforming a RGB values to YIQ values    
 def transformRGB2YIQ(img):
     
@@ -82,8 +66,6 @@ def transformRGB2YIQ(img):
     imgQ = 0.212 * r - 0.523 * g + 0.311 * b
     
     YIQ = cv2.merge([imgY,imgI,imgQ])
-    #saving an image as YIQ
-    #cv2.imwrite('yiq_photo.jpg',cv2.merge([imgQ,imgI,imgY]))
     YIQ = YIQ*(1./255)
     
     return(YIQ)
@@ -107,9 +89,6 @@ def transformYIQ2RGB(img):
     RGB = cv2.merge([imgR,imgG,imgB])
     
     RGB = RGB*(1./255)
-    
-    # saving an image as RGB
-    #cv2.imwrite('rgb_photo.jpg',cv2.merge([imgB,imgG,imgR]))
     return(RGB)
 
 # Equalize an input image, if input is an RGB image it equalize it with Y channle of YIQ values, 
@@ -143,7 +122,6 @@ def histogram(img):
     flat = img.flatten()
     flat = flat.astype(int)
     
-    # histogram of original image
     histOrig = cv2.calcHist([img],[0],None,[256],[0,256])
     cdf = histOrig.cumsum()
 
@@ -152,11 +130,9 @@ def histogram(img):
     cdf = nj / N
     cdf = cdf.astype('uint8')
     
-    # get the value from cumulative sum for every index in flat, 
-    # the results will set as the new image
+    # get the value from cumulative sum for every index in flat, and set that as newImage
     imEq = cdf[flat]
 
-    # histogram of equalized image
     histEq = cv2.calcHist([imEq],[0],None,[256],[0,256])
     imEq = np.reshape(imEq, img.shape)
 
@@ -178,6 +154,7 @@ def showOutput(imOrig, imEq, histOrig, histEq):
     fig.suptitle('Left is original photo, Right is equalized photo', fontsize=16)
     plt.show(block=True)
 
+    # set up side-by-side image display
     fig = plt.figure()
     fig.set_figheight(5)
     fig.set_figwidth(10)
@@ -192,41 +169,33 @@ def showOutput(imOrig, imEq, histOrig, histEq):
     fig.suptitle('Left is histogram of original photo, Right is histogram of equalized photo', fontsize=12)
     plt.show(block=True)
 
-def quantizeImage(imOrig, nQuant, nIter):
-    img = cv2.imread('apple.jpg')
-    Z = img.reshape((-1,3))
-    # convert to np.float32
-    Z = np.float32(Z)
-    # define criteria, number of clusters(K) and apply kmeans()
+#imOrig - input grayscale or RGB image to be quantized.
+#nQuant - number of intensities your output imQuant image should have.
+#nIter  - maximum number of iterations of the optimization procedure.
+def quantizeImage(imOrig, nQuant, nIter ):
+    #imOrig = cv2.imread('applegray.jpg', cv2.IMREAD_COLOR)
+    plt.imshow(cv2.cvtColor(imOrig, cv2.COLOR_BGR2RGB))
+    plt.show()
+
+    img_data = imOrig / 255.0
+    img_data = img_data.reshape((-1, 3))
+
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+    img_data = img_data.astype(np.float32)
+    compactness, labels, centers = cv2.kmeans(img_data, nQuant, None, criteria, nIter,  cv2.KMEANS_RANDOM_CENTERS)
     
-    ret,label,center=cv2.kmeans(Z,nQuant,None,criteria,nIter,cv2.KMEANS_RANDOM_CENTERS)
+    new_colors = centers[labels].reshape((-1, 3))
+    img_recolored = new_colors.reshape(imOrig.shape)
+    plt.imshow(cv2.cvtColor(img_recolored, cv2.COLOR_BGR2RGB))
+    plt.title('16-color image')
+    plt.show()
+
+    return labels, centers
 
 
-    print(label[500])
-    print(center[1])
-    # Now convert back into uint8, and make original image
-    center = np.uint8(center)
-    res = center[label.flatten()]
-    res2 = res.reshape((img.shape))
-    cv2.imshow('res2',res2)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    sse = []
-    list_k = list(range(1, 10))
-
-    for k in list_k:
-        km = KMeans(n_clusters=k)
-        km.fit(X_std)
-        sse.append(km.inertia_)
-
-    # Plot sse against k
-    plt.figure(figsize=(6, 6))
-    plt.plot(list_k, sse, '-o')
-    plt.xlabel(r'Number of clusters *k*')
-    plt.ylabel('Sum of squared distance')
-
+def main():
+    im = imDisplay(filename = 'apple.jpg', representation = 2)
     
-    
-im = imDisplay(filename = 'grayphoto.jpg', representation = 2)
+
+if __name__ == '__main__':
+    main()
