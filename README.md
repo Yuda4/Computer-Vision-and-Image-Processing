@@ -1,10 +1,10 @@
 # Computer-Vision-and-Image-Processing
 
-packages used:  
-numpy  
-numpy.matlib  
-matplotlib.pyplot  
-cv2  
+###### packages used:  
+*numpy  
+*numpy.matlib  
+*matplotlib.pyplot  
+*cv2  
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
