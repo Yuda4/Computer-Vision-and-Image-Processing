@@ -1,7 +1,7 @@
 # Computer-Vision-and-Image-Processing
 
 ## First exercise:
-###packages used:  
+packages used:  
 * numpy  
 * numpy.matlib  
 * matplotlib.pyplot  
@@ -18,7 +18,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Second exercise:
-###packages used:  
+packages used:  
 * numpy   
 * matplotlib.pyplot  
 * cv2  
