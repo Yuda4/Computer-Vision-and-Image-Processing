@@ -40,7 +40,7 @@ def conv2D(inImage, kernel2):
     return norm_image
 
 def convDerivative(inImage):
-    # inImage dimension
+    # inImage dimensions
     height = inImage.shape[0]
     width = inImage.shape[1]
     
