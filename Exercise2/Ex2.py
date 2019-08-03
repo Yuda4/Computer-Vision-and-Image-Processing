@@ -59,8 +59,13 @@ def convDerivative(inImage):
     imgX = conv2D(inImage, kerX)
     imgY = conv2D(inImage, kerY)
     
-    # calculating magnitude(sqrt(imgX**2 + imgY**2))
+    # Creating a new image & calculating magnitude(sqrt(imgX**2 + imgY**2))
     imgMagnitude = np.zeros((inImage.shape[0], inImage.shape[1]), dtype="float32")
+   
+    # normalizing values to [-255,255] in order to make the final image areas with no edges to be black
+    #                                                                   and areas with edges to be colored white.
+    imgX = cv2.normalize(imgX, None, alpha=-255, beta=255, norm_type = cv2.NORM_MINMAX, dtype = cv2.CV_32F)
+    imgY = cv2.normalize(imgX, None, alpha=-255, beta=255, norm_type = cv2.NORM_MINMAX, dtype = cv2.CV_32F)
     imgX = imgX**2
     imgY = imgY**2
 
