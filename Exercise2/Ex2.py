@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+import math
 
 
 def conv1D(inSignal, kernel1):
