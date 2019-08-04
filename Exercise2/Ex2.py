@@ -74,5 +74,57 @@ def convDerivative(inImage):
             imgMagnitude[i,j] = math.sqrt(imgX[i,j] + imgY[i,j])
 
     return imgMagnitude
+
+# making a Gaussian kernel by a given size and sigma (by defualt is 1)    
+def gaussKernel(kernelSize, sigma=1):
+    m, n = [(ss-1.)/2. for ss in kernelSize]
+    y, x = np.ogrid[-m:m+1,-n:n+1]
     
+    h = np.exp( -(x*x + y*y) / (2.*sigma*sigma) )
+    h[h < np.finfo(h.dtype).eps*h.max()] = 0
+    sumh = h.sum()
+    if sumh != 0:
+        h /= sumh
+    return h   
+
+def blurImage1(inImage, kernelSize):
+    if(kernelSize[0] != kernelSize[1]):
+        print("kernelSize needs to be the squared")
+
+    elif(kernelSize[0] % 2 == 0 and kernelSize[1] % 2 == 0):
+        print("kernelSize is even, you should choose an odd number")
+
+    else:
+        gaussianK = gaussKernel(kernelSize, 1)
+        blurredImage = conv2D(inImage, gaussianK)
+        
+        # Plotting the original image and blurred image
+        plt.subplot(122),plt.imshow(inImage, cmap = 'gray'),plt.title('Original')
+        plt.xticks([]), plt.yticks([])
+
+        plt.subplot(121),plt.imshow(blurImage, cmap = 'gray'),plt.title('Gaussian Blur')
+        plt.xticks([]), plt.yticks([])
+        plt.show()
+        
+        return blurredImage
+        
+def blurImage2(inImage, kernelSize):
+    if(kernelSize[0] != kernelSize[1]):
+        print("kernelSize needs to be the squared")
+        
+    elif(kernelSize[0] % 2 == 0 and kernelSize[1] % 2 == 0):
+        print("kernelSize is even, you should choose an odd number")
+
+    else:
+        gaussianK = cv2.getGaussianKernel(kernelSize[0],10)
+        gray = cv2.filter2D(inImage,-1,gaussianK)
+
+        plt.subplot(122),plt.imshow(inImage, cmap = 'gray'),plt.title('Original')
+        plt.xticks([]), plt.yticks([])
+
+        plt.subplot(121),plt.imshow(gray, cmap = 'gray'),plt.title('Gaussian Blur')
+        plt.xticks([]), plt.yticks([])
+
+        plt.show()
+        return gray
 
