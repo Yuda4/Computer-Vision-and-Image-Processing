@@ -1,11 +1,12 @@
 # Computer-Vision-and-Image-Processing
-
-## First exercise:
 packages used:  
 * numpy  
 * numpy.matlib  
 * matplotlib.pyplot  
-* cv2  
+* cv2 
+* PIL
+
+## First exercise:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -18,10 +19,7 @@ packages used:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Second exercise:
-packages used:  
-* numpy   
-* matplotlib.pyplot  
-* cv2  
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   1. Convolution
@@ -30,3 +28,14 @@ packages used:
   4. Hough Circles
   
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Third exercise:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  1. Image Pyramids
+  2. Pyramid Blending
+  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
