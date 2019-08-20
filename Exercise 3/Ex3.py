@@ -122,3 +122,20 @@ def pyramidBlending(img1, img2, mask, maxLevels):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+    
+def main():
+    img = cv2.imread("gray_cat.jpg", 0)
+    lpyr = LaplacianPyramid(img, 3)
+    pyr = LaplacianToImage(lpyr)
+
+    img1 = cv2.imread("baseball_glove.jpg")
+    img2 = cv2.imread("eye.jpg")
+    # img1 = cv2.imread("gray_cat.jpg", 0)
+    # img2 = cv2.imread("gray_apple.jpg", 0)
+    mask = cv2.imread("mask.jpg")
+
+    blending(img2, img1, mask, 7)
+    
+
+if __name__ == '__main__':
+        main()
