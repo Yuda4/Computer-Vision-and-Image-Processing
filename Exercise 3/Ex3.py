@@ -67,8 +67,8 @@ def LaplacianToImage(lpyr):
     return reconstructed_image
     
 def pyramidBlending(img1, img2, mask, maxLevels):
-    img1 = cv2.resize(img1, (img1.shape[1], img1.shape[1]))
-    img2 = cv2.resize(img2, (img1.shape[1], img1.shape[1]))
+    img1 = cv2.resize(img1, (img1.shape[1], img1.shape[0]))
+    img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
 
     mask = cv2.GaussianBlur(mask, (21,21),11 )
 
