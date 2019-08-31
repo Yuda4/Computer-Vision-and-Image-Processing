@@ -125,7 +125,6 @@ def blurImage2(inImage, kernelSize):
         plt.show()
         return gray
 
-
 def edgeDetectionSobel(I):
 
     # Smoothing
@@ -280,4 +279,3 @@ def houghCircle(I,minRadius,maxRadius):
     cv2.imshow('detected circles',cimg)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-

@@ -121,8 +121,7 @@ def pyramidBlending(img1, img2, mask, maxLevels):
     imgFinal.save('blended_image.png')
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
-    
+   
 def main():
     img = cv2.imread("gray_cat.jpg", 0)
     lpyr = LaplacianPyramid(img, 3)
