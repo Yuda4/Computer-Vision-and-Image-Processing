@@ -110,6 +110,3 @@ if __name__ == '__main__':
     computeHomography(src_pnt, dst_pnt)
 
 
-# https://github.com/davechristian/Simple-SSD-Stereo/blob/master/stereomatch_SSD.py
-
-
