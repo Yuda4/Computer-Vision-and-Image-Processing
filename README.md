@@ -1,4 +1,4 @@
-# Computer-Vision-and-Image-Processing
+# Computer Vision and Image Processing | Ariel University
 packages used:  
 * numpy  
 * numpy.matlib  
